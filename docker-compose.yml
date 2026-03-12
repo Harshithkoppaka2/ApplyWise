@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      DATABASE_URL: jdbc:h2:file:/app/data/applywise;DB_CLOSE_ON_EXIT=FALSE
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-gpt-4.1-mini}
+    volumes:
+      - applywise-data:/app/data
+    ports:
+      - "8080:8080"
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    environment:
+      API_PROXY_TARGET: http://backend:8080
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+volumes:
+  applywise-data:
